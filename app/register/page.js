@@ -1,0 +1,7 @@
+"use client";
+import { useState } from "react"; import { useRouter } from "next/navigation"; import Link from "next/link"; import { api, saveSession } from "../../lib/api";
+export default function Register() {
+  const router = useRouter(); const [form, setForm] = useState({ name: "", email: "", password: "", role: "user" }); const [error, setError] = useState("");
+  async function submit(e) { e.preventDefault(); setError(""); try { const data = await api("/auth/register", { method: "POST", body: JSON.stringify(form) }); saveSession(data); router.push(form.role === "hotel" ? "/hotel/dashboard" : "/user/dashboard"); } catch (err) { setError(err.message); } }
+  return <main className="container"><form className="form-card" onSubmit={submit}><h2>Create account</h2><label>Name<input required value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} /></label><label>Email<input required type="email" value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} /></label><label>Password<input required minLength="6" type="password" value={form.password} onChange={e => setForm({ ...form, password: e.target.value })} /></label><label>Role<select value={form.role} onChange={e => setForm({ ...form, role: e.target.value })}><option value="user">User</option><option value="hotel">Hotel</option></select></label>{error && <p className="error">{error}</p>}<button className="button">Register</button><p className="muted">Already registered? <Link href="/login">Login</Link></p></form></main>;
+} 
